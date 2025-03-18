@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\01. Main">
+      <UniqueIdentifier>{abe088ca-4658-4992-b7e5-8e5230413882}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\99. Header">
+      <UniqueIdentifier>{716d6a72-1ec2-45f2-86dd-8fdea0523eec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\99. Header\Abdrineda">
+      <UniqueIdentifier>{19072eaf-9b20-4f9f-9a28-1da4f2da02c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CUDA">
+      <UniqueIdentifier>{a2247bb3-ca06-4f39-a4b2-446d96adc79d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\98. Shaders">
+      <UniqueIdentifier>{1a3f866d-5eaa-415e-b623-4f02cfc34eff}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CUDADX11.h">
+      <Filter>Source Files\01. Main</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Source Files\99. Header\Abdrineda</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Source Files\99. Header\Abdrineda</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Source Files\99. Header\Abdrineda</Filter>
+    </ClInclude>
+    <ClInclude Include="Values.h">
+      <Filter>Source Files\99. Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Struct.h">
+      <Filter>Source Files\99. Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Source Files\99. Header</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Source Files\99. Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Source Files\01. Main</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CUDADX11.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="CUDADX11.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CUDADX11.cpp">
+      <Filter>Source Files\01. Main</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files\99. Header</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\01. Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Graphics.cu">
+      <Filter>Source Files\CUDA</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Default.hlsl">
+      <Filter>Source Files\98. Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
