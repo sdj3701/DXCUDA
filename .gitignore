@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+--------------------------------------------------------------
+
+# Binaries
+CUDADX11/Binaries
+
+# Debug
+CUDADX11/Debug
+
+# x64
+CUDADX11/x64
