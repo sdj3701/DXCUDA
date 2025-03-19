@@ -24,6 +24,9 @@
     <Filter Include="Source Files\98. Shaders">
       <UniqueIdentifier>{1a3f866d-5eaa-415e-b623-4f02cfc34eff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\55. Graphics">
+      <UniqueIdentifier>{e5fd9705-5644-48cb-b0fe-eda87a705a26}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CUDADX11.h">
@@ -53,6 +56,9 @@
     <ClInclude Include="Game.h">
       <Filter>Source Files\01. Main</Filter>
     </ClInclude>
+    <ClInclude Include="Gaussianblur.h">
+      <Filter>Source Files\55. Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CUDADX11.rc">
@@ -76,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files\01. Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Gaussianblur.cpp">
+      <Filter>Source Files\55. Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -3,18 +3,21 @@
 #include "Types.h"
 #include "Values.h"
 #include "Struct.h"
-
+#include <iostream>
 // STL
 #include <vector>
 #include <list>
 #include <map>
 #include <unordered_map>
 #include <string>
+#include <algorithm>
 using namespace std;
 
 // Win
 #include <Windows.h>
 #include <assert.h>
+// 가속 멀티쓰레딩
+#include <omp.h>
 
 //DX
 #include <d3d11.h>
@@ -36,3 +39,4 @@ using namespace Microsoft::WRL;
 #endif // _DEBUG
 
 #define CHECK(p) assert(SUCCEEDED(p))
+

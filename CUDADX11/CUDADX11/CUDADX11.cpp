@@ -20,6 +20,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+    // 콘솔 창 생성
+    AllocConsole();
+
     // 윈도우 창 정보 등록
     MyRegisterClass(hInstance);
 

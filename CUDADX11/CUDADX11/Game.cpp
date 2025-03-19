@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Game.h"
+#include "Gaussianblur.h"
 
 Game::Game()
 {
@@ -38,6 +39,10 @@ void Game::Update()
 {
 	/*_transformData.offset.x += 0.003f;
 	_transformData.offset.y += 0.003f;*/
+
+	Gaussianblur gaussianblur;
+	gaussianblur.RightUpEffect();
+
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));
@@ -301,13 +306,26 @@ void Game::CreateSRV()
 	DirectX::TexMetadata md;
 	DirectX::ScratchImage img;
 
-	HRESULT hr = ::LoadFromWICFile(L"2Dimage.jpg", WIC_FLAGS_NONE, &md, img);
+	const wchar_t* filename = L"image_1.jpg";
+
+	HRESULT hr = ::LoadFromWICFile(filename, WIC_FLAGS_NONE, &md, img);
 	CHECK(hr);
+
+	// 픽셀 데이터 추출 가우시안 블러를 적용하기 위한 추가 작업
+	const DirectX::Image* image = img.GetImage(0, 0, 0);
+	if (!image)
+	{
+		std::cout << "not find Image : " << filename << "\n";
+		return;
+	}
+
+	// 데이터 휘발성 때문에 사라짐
+	Gaussianblur gaussianblur;
+	// 픽셀데이터 추출
+	gaussianblur.ProcessPixelDataFromDirectXImage(img, md);
 
 	hr = ::CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
 	CHECK(hr);
-
-
 
 }
 
