@@ -80,7 +80,6 @@ void Gaussianblur::RightUpEffect()
         pixels[i].y = max(pixels[i].y * 0.99f, 0.0f);
         pixels[i].z = max(pixels[i].z * 0.99f, 0.0f);
     }
-    
 }
 
 //void Gaussianblur::OldRightUpEffect(const DirectX::ScratchImage& img, const DirectX::TexMetadata& md)

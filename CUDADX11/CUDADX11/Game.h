@@ -37,6 +37,9 @@ private:
 	void LoadShaderFromFile(const wstring& path, const string& name, const string& version, ComPtr<ID3DBlob>& blob);
 
 private:
+	void UpdateTexture();
+
+private:
 	HWND _hwnd;
 	uint32 _width = 0;
 	uint32 _height = 0;

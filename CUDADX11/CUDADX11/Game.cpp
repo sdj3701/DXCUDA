@@ -41,10 +41,12 @@ void Game::Update()
 	_transformData.offset.y += 0.003f;*/
 	if (test)
 	{
-		cout << "test" << "\n";
 		gaussianblur.RightUpEffect();
-	}
+		cout << gaussianblur.pixels[0].x << " " << gaussianblur.pixels[0].y << " " << gaussianblur.pixels[0].z << endl;
 
+		// 변경된 픽셀 데이터를 텍스처에 다시 업로드
+		UpdateTexture();
+	}
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));
@@ -321,8 +323,6 @@ void Game::CreateSRV()
 		return;
 	}
 
-	// 데이터 휘발성 때문에 사라짐
-	
 	// 픽셀데이터 추출
 	gaussianblur.ProcessPixelDataFromDirectXImage(img, md);
 
@@ -360,4 +360,44 @@ void Game::LoadShaderFromFile(const wstring& path, const string& name, const str
 		nullptr);
 
 	CHECK(hr);
+}
+
+void Game::UpdateTexture()
+{
+	// 1. 기존 텍스처를 가져오기
+	ComPtr<ID3D11Resource> resource;
+	_shaderResourceView->GetResource(resource.GetAddressOf());
+
+	ComPtr<ID3D11Texture2D> texture;
+	resource.As(&texture);
+
+	// 2. 수정된 픽셀 데이터로 텍스처 업데이트
+	D3D11_TEXTURE2D_DESC desc;
+	texture->GetDesc(&desc);
+
+	// 픽셀 데이터를 RGBA 형식으로 변환
+	std::vector<uint8_t> rawPixels(gaussianblur.width * gaussianblur.height * 4);
+	for (size_t i = 0; i < gaussianblur.pixels.size(); i++)
+	{
+		rawPixels[i * 4 + 0] = static_cast<uint8_t>(gaussianblur.pixels[i].x * 255.0f);
+		rawPixels[i * 4 + 1] = static_cast<uint8_t>(gaussianblur.pixels[i].y * 255.0f);
+		rawPixels[i * 4 + 2] = static_cast<uint8_t>(gaussianblur.pixels[i].z * 255.0f);
+		rawPixels[i * 4 + 3] = static_cast<uint8_t>(gaussianblur.pixels[i].w * 255.0f);
+	}
+
+	// 텍스처 업데이트
+	D3D11_BOX box;
+	box.left = 0;
+	box.right = gaussianblur.width;
+	box.top = 0;
+	box.bottom = gaussianblur.height;
+	box.front = 0;
+	box.back = 1;
+
+	_deviceContext->UpdateSubresource(
+		texture.Get(), 0, &box,
+		rawPixels.data(),
+		gaussianblur.width * 4,
+		gaussianblur.width * gaussianblur.height * 4
+	);
 }
