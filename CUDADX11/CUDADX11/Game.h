@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Gaussianblur.h"
 
 class Game
 {
@@ -40,6 +40,8 @@ private:
 	HWND _hwnd;
 	uint32 _width = 0;
 	uint32 _height = 0;
+	Gaussianblur gaussianblur;
+	bool test = false;
 
 private:
 	// Device & SwapChain

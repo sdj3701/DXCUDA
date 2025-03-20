@@ -39,9 +39,11 @@ void Game::Update()
 {
 	/*_transformData.offset.x += 0.003f;
 	_transformData.offset.y += 0.003f;*/
-
-	Gaussianblur gaussianblur;
-	gaussianblur.RightUpEffect();
+	if (test)
+	{
+		cout << "test" << "\n";
+		gaussianblur.RightUpEffect();
+	}
 
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
@@ -320,13 +322,13 @@ void Game::CreateSRV()
 	}
 
 	// 데이터 휘발성 때문에 사라짐
-	Gaussianblur gaussianblur;
+	
 	// 픽셀데이터 추출
 	gaussianblur.ProcessPixelDataFromDirectXImage(img, md);
 
 	hr = ::CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
 	CHECK(hr);
-
+	test = true;
 }
 
 void Game::CreateConstantBuffer()

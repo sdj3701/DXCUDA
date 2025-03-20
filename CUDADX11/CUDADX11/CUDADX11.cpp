@@ -20,8 +20,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+    
+    FILE* pFile = nullptr;
     // 콘솔 창 생성
-    AllocConsole();
+    if (AllocConsole()) {
+        freopen_s(&pFile, "CONIN$", "rb", stdin);
+        freopen_s(&pFile, "CONOUT$", "wb", stdout);
+        freopen_s(&pFile, "CONOUT$", "wb", stderr);
+    }
 
     // 윈도우 창 정보 등록
     MyRegisterClass(hInstance);
