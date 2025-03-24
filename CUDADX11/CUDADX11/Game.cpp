@@ -40,7 +40,7 @@ void Game::Update()
 	/*_transformData.offset.x += 0.003f;
 	_transformData.offset.y += 0.003f;*/
 
-	gaussianblur.RightUpEffect(_shaderResourceView, _deviceContext);
+	gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));

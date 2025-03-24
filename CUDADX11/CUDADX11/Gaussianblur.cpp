@@ -67,7 +67,7 @@ void Gaussianblur::ProcessPixelDataFromDirectXImage(const DirectX::ScratchImage&
     }
 }
 
-void Gaussianblur::RightUpEffect(ComPtr<ID3D11ShaderResourceView> _shaderResourceView, ComPtr<ID3D11DeviceContext> _deviceContext)
+void Gaussianblur::RightUpDownEffect(ComPtr<ID3D11ShaderResourceView> _shaderResourceView, ComPtr<ID3D11DeviceContext> _deviceContext)
 {
     // 이렇게 코드를 짠 이유
     // 지금 Update에서 상수 버퍼를 Map/Umap에서 관리를 하기 때문에
@@ -163,3 +163,100 @@ void Gaussianblur::RightUpEffect(ComPtr<ID3D11ShaderResourceView> _shaderResourc
     );
 
 }
+
+void Gaussianblur::GaussianblurEffect(ComPtr<ID3D11ShaderResourceView> _shaderResourceView, ComPtr<ID3D11DeviceContext> _deviceContext)
+{
+
+    const float weights[5] = { 0.0545f, 0.2442f, 0.4026f, 0.2442f, 0.0545f };
+
+    vector<Vec4> pixelsBuffer(pixels.size());
+
+    // 가로 x 방향
+    for (int j = 0; j < height; j++)
+    {
+        for (int i = 0; i < width; i++)
+        {
+            Vec4 neighborColorSum{ 0.0f,0.0f,0.0f,1.0f };
+            for (int si = 0; si < 5; si++)
+            {
+                int input = i + si - 2;
+                int it = min(max(input, 0), width - 1);
+                int jt = min(max(j, 0), height - 1);
+                Vec4 neighborColor = pixels[it + width * jt];
+                neighborColorSum.x += neighborColor.x * weights[si];
+                neighborColorSum.y += neighborColor.y * weights[si];
+                neighborColorSum.z += neighborColor.z * weights[si];
+            }
+
+            pixelsBuffer[i + width * j].x = neighborColorSum.x;
+            pixelsBuffer[i + width * j].y = neighborColorSum.y;
+            pixelsBuffer[i + width * j].z = neighborColorSum.z;
+        }
+    }
+
+    std::swap(pixels, pixelsBuffer);
+
+    for (int j = 0; j < height; j++)
+    {
+        for (int i = 0; i < width; i++)
+        {
+            Vec4 neighborColorSum{ 0.0f,0.0f,0.0f,1.0f };
+            for (int si = 0; si < 5; si++)
+            {
+                int input = j + si - 2;
+                int it = min(max(i, 0), width - 1);
+                int jt = min(max(input, 0), height - 1);
+                Vec4 neighborColor = pixels[it + width * jt];
+                neighborColorSum.x += neighborColor.x * weights[si];
+                neighborColorSum.y += neighborColor.y * weights[si];
+                neighborColorSum.z += neighborColor.z * weights[si];
+            }
+
+            pixelsBuffer[i + width * j].x = neighborColorSum.x;
+            pixelsBuffer[i + width * j].y = neighborColorSum.y;
+            pixelsBuffer[i + width * j].z = neighborColorSum.z;
+        }
+    }
+
+    std::swap(pixels, pixelsBuffer);
+
+    // 1. 기존 텍스처를 가져오기
+    ComPtr<ID3D11Resource> resource;
+    _shaderResourceView->GetResource(resource.GetAddressOf());
+
+    ComPtr<ID3D11Texture2D> texture;
+    resource.As(&texture);
+
+    // 2. 수정된 픽셀 데이터로 텍스처 업데이트
+    D3D11_TEXTURE2D_DESC desc;
+    texture->GetDesc(&desc);
+
+    // 픽셀 데이터를 RGBA 형식으로 변환
+    std::vector<uint8_t> rawPixels(width * height * 4);
+
+    for (size_t i = 0; i < pixels.size(); i++)
+    {
+        rawPixels[i * 4 + 0] = static_cast<uint8_t>(pixels[i].x * 255.0f);
+        rawPixels[i * 4 + 1] = static_cast<uint8_t>(pixels[i].y * 255.0f);
+        rawPixels[i * 4 + 2] = static_cast<uint8_t>(pixels[i].z * 255.0f);
+        rawPixels[i * 4 + 3] = static_cast<uint8_t>(pixels[i].w * 255.0f);
+    }
+
+    // 텍스처 업데이트
+    D3D11_BOX box;
+    box.left = 0;
+    box.right = width;
+    box.top = 0;
+    box.bottom = height;
+    box.front = 0;
+    box.back = 1;
+
+    _deviceContext->UpdateSubresource(
+        texture.Get(), 0, &box,
+        rawPixels.data(),
+        width * 4,
+        width * height * 4
+    );
+
+}
+
