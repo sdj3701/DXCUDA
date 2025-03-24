@@ -1,0 +1,63 @@
+# CUDADX11 Project Structure Summary
+
+## Overview
+This project is a Windows application that combines DirectX 11 and CUDA to implement image processing functionality.
+It primarily processes image effects such as Gaussian blur through the GPU and renders them to the screen with DirectX.
+
+## Main File Structure
+1. **Core Application Files**
+   - CUDADX11.cpp: Main entry point, window creation, and game loop management
+   - CUDADX11.h: Application header file
+   - Game.cpp/Game.h: Game logic and rendering pipeline implementation
+   - Gaussianblur.cpp/Gaussianblur.h: Gaussian blur image processing implementation
+
+2. **Graphics Related Files**
+   - Graphics.cu: CUDA-based graphics processing implementation
+   - Default.hlsl: Shader code (Vertex/Pixel shaders)
+   - Struct.h, Types.h, Values.h: Data structures and constant definitions
+
+3. **Support Files**
+   - framework.h, Resource.h, targetver.h: Framework support headers
+   - pch.h, pch.cpp: Precompiled headers
+
+4. **Resource Files**
+   - 2Dimage.jpg, image_1.JPG: Image resources
+   - CUDADX11.ico, small.ico: Icon files
+   - CUDADX11.rc: Resource script
+
+## Rendering Pipeline
+1. **Initialization Phase (Game::Init)**
+   - Device and swap chain creation
+   - Render target view setup
+   - Viewport configuration
+   - Geometric shape (mesh) creation
+   - Shader compilation and setup
+   - Various states (rasterizer, sampler, blend) setup
+
+2. **Rendering Phase (Game::Render)**
+   - Rendering start (RenderBegin)
+   - IA (Input Assembler) setup
+   - VS (Vertex Shader) setup
+   - RS (Rasterizer Stage) setup
+   - PS (Pixel Shader) setup
+   - OM (Output Merger) setup
+   - Draw call execution
+   - Rendering end (RenderEnd)
+
+3. **Update Phase (Game::Update)**
+   - Apply Gaussian blur effect (RightUpEffect)
+   - Texture update
+   - Constant buffer update
+
+## Image Processing Features
+- Gaussian blur effect implementation through the Gaussianblur class
+- Pixel data extraction and processing from DirectX images
+- Parallel processing implementation using CUDA (Graphics.cu)
+- Display processed image data on screen by converting to DirectX textures
+
+## Potential Improvements
+1. Introduce rendering pipeline state caching
+2. Implement object-oriented rendering system
+3. Add various image processing effects
+4. Performance optimization and profiling tool integration
+5. Support for multiple object rendering

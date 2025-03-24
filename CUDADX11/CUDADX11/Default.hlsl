@@ -22,6 +22,7 @@ cbuffer TransformData : register(b0)
 VS_OUTPUT VS(VS_INPUT input)
 {
     VS_OUTPUT output;
+    // vs 작업을 하고 RS 까지 작업을 하고 넘김 (보간 작업)
     output.position = input.position + offset;
     output.uv = input.uv;
     
@@ -33,6 +34,7 @@ SamplerState sampler0 : register(s0);
 
 float4 PS(VS_OUTPUT input) : SV_Target
 {
+    // 색상 작업
     float4 color = texture0.Sample(sampler0, input.uv);
     
     return color;

@@ -11,6 +11,6 @@ public:
 
 public:
 	void ProcessPixelDataFromDirectXImage(const DirectX::ScratchImage& img, const DirectX::TexMetadata& md);
-	void RightUpEffect();
+	void RightUpEffect(ComPtr<ID3D11ShaderResourceView> _shaderResourceView, ComPtr<ID3D11DeviceContext> _deviceContext);
 };
 

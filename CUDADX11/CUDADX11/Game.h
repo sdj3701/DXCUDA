@@ -36,15 +36,13 @@ private:
 
 	void LoadShaderFromFile(const wstring& path, const string& name, const string& version, ComPtr<ID3DBlob>& blob);
 
-private:
-	void UpdateTexture();
+
 
 private:
 	HWND _hwnd;
 	uint32 _width = 0;
 	uint32 _height = 0;
 	Gaussianblur gaussianblur;
-	bool test = false;
 
 private:
 	// Device & SwapChain
@@ -79,7 +77,7 @@ private:
 	ComPtr<ID3D11PixelShader> _pixelShader = nullptr;
 	ComPtr<ID3DBlob> _psBlob = nullptr;
 
-	// SRV
+	// SV
 	ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
 
 
