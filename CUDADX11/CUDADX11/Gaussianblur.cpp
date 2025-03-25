@@ -179,10 +179,7 @@ void Gaussianblur::GaussianblurEffect(ComPtr<ID3D11ShaderResourceView> _shaderRe
             Vec4 neighborColorSum{ 0.0f,0.0f,0.0f,1.0f };
             for (int si = 0; si < 5; si++)
             {
-                int input = i + si - 2;
-                int it = min(max(input, 0), width - 1);
-                int jt = min(max(j, 0), height - 1);
-                Vec4 neighborColor = pixels[it + width * jt];
+                Vec4 neighborColor = GetPixel(i + si - 2, j);
                 neighborColorSum.x += neighborColor.x * weights[si];
                 neighborColorSum.y += neighborColor.y * weights[si];
                 neighborColorSum.z += neighborColor.z * weights[si];
@@ -203,10 +200,7 @@ void Gaussianblur::GaussianblurEffect(ComPtr<ID3D11ShaderResourceView> _shaderRe
             Vec4 neighborColorSum{ 0.0f,0.0f,0.0f,1.0f };
             for (int si = 0; si < 5; si++)
             {
-                int input = j + si - 2;
-                int it = min(max(i, 0), width - 1);
-                int jt = min(max(input, 0), height - 1);
-                Vec4 neighborColor = pixels[it + width * jt];
+                Vec4 neighborColor = GetPixel(i, j + si - 2);
                 neighborColorSum.x += neighborColor.x * weights[si];
                 neighborColorSum.y += neighborColor.y * weights[si];
                 neighborColorSum.z += neighborColor.z * weights[si];
@@ -258,5 +252,48 @@ void Gaussianblur::GaussianblurEffect(ComPtr<ID3D11ShaderResourceView> _shaderRe
         width * height * 4
     );
 
+}
+
+void Gaussianblur::Bloom(ComPtr<ID3D11ShaderResourceView> _shaderResourceView, ComPtr<ID3D11DeviceContext> _deviceContext)
+{
+    vector<Vec4> pixelsBackup(pixels.size());
+
+    for (int j = 0; j < height; j++)
+    {
+        for (int i = 0; i < width; i++)
+        {
+            auto& c = GetPixel(i, j);
+            const float relativeLuminance = 0.2126 * c.x + 0.7152 * c.y + 0.0722 * c.z;
+            
+            if (relativeLuminance < 0.3f)
+            {
+                c.x = 0.0f;
+                c.y = 0.0f;
+                c.z = 0.0f;
+            }
+        }
+    }
+
+
+    for (int i = 0; i < 1000; i++)
+    {
+        GaussianblurEffect(_shaderResourceView, _deviceContext);
+    }
+
+    for (int i = 0; i < pixelsBackup.size(); i++)
+    {
+        pixels[i].x = min(max(pixels[i].x * 1.0f + pixelsBackup[i].x, 0.0f), 1.0f);
+        pixels[i].y = min(max(pixels[i].y * 1.0f + pixelsBackup[i].y, 0.0f), 1.0f);
+        pixels[i].z = min(max(pixels[i].z * 1.0f + pixelsBackup[i].z, 0.0f), 1.0f);
+    }
+
+}
+
+Vec4& Gaussianblur::GetPixel(int i, int j)
+{
+    i = min(max(i, 0), width - 1);
+    j = min(max(j, 0), height - 1);
+
+    return pixels[i + width * j];
 }
 

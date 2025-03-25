@@ -1,4 +1,5 @@
 #pragma once
+#include <wincrypt.h>
 class Gaussianblur
 {
 private:
@@ -14,5 +15,8 @@ public:
 	void RightUpDownEffect(ComPtr<ID3D11ShaderResourceView> _shaderResourceView, ComPtr<ID3D11DeviceContext> _deviceContext);
 	
 	void GaussianblurEffect(ComPtr<ID3D11ShaderResourceView> _shaderResourceView, ComPtr<ID3D11DeviceContext> _deviceContext);
+	void Bloom(ComPtr<ID3D11ShaderResourceView> _shaderResourceView, ComPtr<ID3D11DeviceContext> _deviceContext);
+	Vec4& GetPixel(int i, int j);
+
 };
 
