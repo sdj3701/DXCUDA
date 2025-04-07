@@ -18,6 +18,9 @@ void Game::Init(HWND hwnd)
 	_width = GWinSizeX;
 	_height = GWinSizeY;
 
+	// 구 생성
+	circle = make_unique<Circle>(Circle({ 10.0f,10.0f }, 4.0f, { 1.0f,0.f,0.f,1.0f }));
+
 	CreateDeviceAndSwapChain();		// 뒷편에서 그림을 그리고 메인 화면에 출력
 	CreateRenderTargetView();		// 백 버퍼를 가져와서 이를 렌더 타겟 뷰로 변환
 	SetViewport();					// 3D 렌더링이 표시될 영역을 정의합니다.
@@ -40,7 +43,9 @@ void Game::Update()
 	/*_transformData.offset.x += 0.003f;
 	_transformData.offset.y += 0.003f;*/
 
-	gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
+	//gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
+
+	// ImGui 창 생성
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));
@@ -100,7 +105,34 @@ void Game::Render()
 		_deviceContext->DrawIndexed(_indices.size(), 0, 0);
 	}
 
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 	RenderEnd();
+}
+
+int Game::GetWidth()
+{
+	return this->_width;
+}
+
+int Game::GetHeight()
+{
+	return this->_height;
+}
+
+ID3D11Device* Game::GetDevice()
+{
+	return _device.Get();
+}
+
+ID3D11DeviceContext* Game::GetDeviceContext()
+{
+	return _deviceContext.Get();
+}
+
+HWND Game::GetHwnd()
+{
+	return _hwnd;
 }
 
 void Game::RenderBegin()

@@ -41,6 +41,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     Game game;
     game.Init(hWnd);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.DisplaySize = ImVec2(game.GetWidth(), game.GetHeight());
+    ImGui::StyleColorsLight();
+
+    ImGui_ImplDX11_Init(game.GetDevice(), game.GetDeviceContext());
+    ImGui_ImplWin32_Init(game.GetHwnd());
+
     MSG msg = {};
 
     // Main message loop:
@@ -53,14 +62,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            game.Render();
+            // ImGui 새 프레임 시작
+            ImGui_ImplDX11_NewFrame();
+            ImGui_ImplWin32_NewFrame();
+            ImGui::NewFrame();
+
+            // ImGui UI 코드
+            ImGui::Begin("Hello ImGui");
+            ImGui::Text("This is a test window");
+            ImGui::End();
+
             game.Update();
+
+            // 렌더링 전 ImGui 마무리
+            ImGui::Render();
+
+            game.Render();
         }
     }
+
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
 
     return (int) msg.wParam;
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
 //
@@ -132,6 +160,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+        return true;
+
     switch (message)
     {
     case WM_COMMAND:

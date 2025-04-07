@@ -27,6 +27,15 @@
     <Filter Include="Source Files\55. Graphics">
       <UniqueIdentifier>{e5fd9705-5644-48cb-b0fe-eda87a705a26}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\56. Object">
+      <UniqueIdentifier>{43e0cba7-225c-4971-9a77-956b32bb2d90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\56. Object\Shpere">
+      <UniqueIdentifier>{7824508a-1b58-4f72-8f0a-33e64474ffd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\56. Object\Shpere\Circle">
+      <UniqueIdentifier>{9e434432-df43-4033-acb3-2afaee51d77e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CUDADX11.h">
@@ -59,6 +68,12 @@
     <ClInclude Include="Gaussianblur.h">
       <Filter>Source Files\55. Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Source Files\56. Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Circle.h">
+      <Filter>Source Files\56. Object\Shpere\Circle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CUDADX11.rc">
@@ -85,6 +100,12 @@
     </ClCompile>
     <ClCompile Include="Gaussianblur.cpp">
       <Filter>Source Files\55. Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files\56. Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Circle.cpp">
+      <Filter>Source Files\56. Object\Shpere\Circle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

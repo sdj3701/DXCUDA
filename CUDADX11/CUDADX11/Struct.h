@@ -13,3 +13,11 @@ struct TransformData
 	Vec3 offset;
 	float dummy;
 };
+
+struct CircleData 
+{
+	Vec2 center;
+	float radius;
+	float padding;
+	Vec4 color;
+};

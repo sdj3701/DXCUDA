@@ -1,5 +1,6 @@
 #pragma once
 #include "Gaussianblur.h"
+#include "Circle.h"
 
 class Game
 {
@@ -11,6 +12,16 @@ public:
 	void Init(HWND hwnd);
 	void Update();
 	void Render();
+
+public:
+	// 메인에서 필요한 데이터 반환
+	int GetWidth();
+	int GetHeight();
+
+	// ImGui에서 필요한 데이터 반환
+	ID3D11Device* GetDevice();
+	ID3D11DeviceContext* GetDeviceContext();
+	HWND GetHwnd();
 
 private:
 	void RenderBegin();
@@ -43,6 +54,8 @@ private:
 	uint32 _width = 0;
 	uint32 _height = 0;
 	Gaussianblur gaussianblur;
+	unique_ptr<Circle> circle;
+	
 
 private:
 	// Device & SwapChain
