@@ -216,65 +216,69 @@ void Game::SetViewport()
 
 void Game::CreateGeometry()
 {
-	// VertexData
-	// 정점에 대한 정보(Data) 입력
+
+
+	// 이미지 출력하는 코드
 	{
-		_vertices.resize(4);
+	//	// VertexData
+	//// 정점에 대한 정보(Data) 입력
+	//	{
+	//		_vertices.resize(4);
 
-		_vertices[0].position = Vec3(-0.5f, -0.5f, 0.f);
-		_vertices[0].uv = Vec2(0.f, 1.f);
-		//_vertices[0].color = Color(1.f, 0.f, 0.f, 1.f);
-		_vertices[1].position = Vec3(-0.5f, 0.5f, 0.f);
-		_vertices[1].uv = Vec2(0.f, 0.f);
-		//_vertices[1].color = Color(1.f, 0.f, 0.f, 1.f);
-		_vertices[2].position = Vec3(0.5f, -0.5f, 0.f);
-		_vertices[2].uv = Vec2(1.f, 1.f);
-		//_vertices[2].color = Color(1.f, 0.f, 0.f, 1.f);
-		_vertices[3].position = Vec3(0.5f, 0.5f, 0.f);
-		_vertices[3].uv = Vec2(1.f, 0.f);
-		//_vertices[3].color = Color(1.f, 0.f, 0.f, 1.f);
+	//		_vertices[0].position = Vec3(-0.5f, -0.5f, 0.f);
+	//		_vertices[0].uv = Vec2(0.f, 1.f);
+	//		//_vertices[0].color = Color(1.f, 0.f, 0.f, 1.f);
+	//		_vertices[1].position = Vec3(-0.5f, 0.5f, 0.f);
+	//		_vertices[1].uv = Vec2(0.f, 0.f);
+	//		//_vertices[1].color = Color(1.f, 0.f, 0.f, 1.f);
+	//		_vertices[2].position = Vec3(0.5f, -0.5f, 0.f);
+	//		_vertices[2].uv = Vec2(1.f, 1.f);
+	//		//_vertices[2].color = Color(1.f, 0.f, 0.f, 1.f);
+	//		_vertices[3].position = Vec3(0.5f, 0.5f, 0.f);
+	//		_vertices[3].uv = Vec2(1.f, 0.f);
+	//		//_vertices[3].color = Color(1.f, 0.f, 0.f, 1.f);
+	//	}
+
+	//	// VertexBuffer
+	//	// CPU메모리에 있는 데이터를 GPU메모리에 넘겨줘야하는 작업
+	//	{
+	//		D3D11_BUFFER_DESC desc;
+	//		ZeroMemory(&desc, sizeof(desc));
+	//		desc.Usage = D3D11_USAGE_IMMUTABLE; // 중요 : 어떻게 작업을 할 것인지? GPU만 읽을지 쓸지 정하는 방법 데이터
+	//		//		  처음 생성하면서 읽으면 원점을 수정하지 않기 때문에 읽기만 사용
+	//		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER; // 어떤 방법으로 바인드 할 것인지?
+	//		desc.ByteWidth = (uint32)(sizeof(Vertex) * _vertices.size());
+
+	//		D3D11_SUBRESOURCE_DATA data;
+	//		ZeroMemory(&data, sizeof(data));
+	//		data.pSysMem = _vertices.data(); // CPU의 처음 데이터를 입력
+
+	//		// GPU에 메모리 생성 후 데이터 넘김
+	//		HRESULT hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf());
+	//		CHECK(hr);
+	//	}
+
+	//	// index
+	//	{
+	//		_indices = { 0,1,2,2,1,3 };
+	//	}
+
+	//	// IndexBuffer
+	//	{
+	//		D3D11_BUFFER_DESC desc;
+	//		ZeroMemory(&desc, sizeof(desc));
+	//		desc.Usage = D3D11_USAGE_IMMUTABLE;
+	//		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	//		desc.ByteWidth = (uint32)(sizeof(uint32) * _indices.size());
+
+	//		D3D11_SUBRESOURCE_DATA data;
+	//		ZeroMemory(&data, sizeof(data));
+	//		data.pSysMem = _indices.data();
+
+	//		HRESULT hr = _device->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
+	//		CHECK(hr);
+	//	}
 	}
-
-	// VertexBuffer
-	// CPU메모리에 있는 데이터를 GPU메모리에 넘겨줘야하는 작업
-	{
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Usage = D3D11_USAGE_IMMUTABLE; // 중요 : 어떻게 작업을 할 것인지? GPU만 읽을지 쓸지 정하는 방법 데이터
-											//		  처음 생성하면서 읽으면 원점을 수정하지 않기 때문에 읽기만 사용
-		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER; // 어떤 방법으로 바인드 할 것인지?
-		desc.ByteWidth = (uint32)(sizeof(Vertex) * _vertices.size()); 
-
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = _vertices.data(); // CPU의 처음 데이터를 입력
-
-		// GPU에 메모리 생성 후 데이터 넘김
-		HRESULT hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf());
-		CHECK(hr);
-	}
-
-	// index
-	{
-		_indices = { 0,1,2,2,1,3 };
-	}
-
-	// IndexBuffer
-	{
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Usage = D3D11_USAGE_IMMUTABLE;
-		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		desc.ByteWidth = (uint32)(sizeof(uint32) * _indices.size());
-
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = _indices.data();
-
-		HRESULT hr = _device->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
-		CHECK(hr);
-	}
-
 }
 
 void Game::CreateInputLayout()
