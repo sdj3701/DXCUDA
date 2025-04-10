@@ -18,6 +18,12 @@ using namespace std;
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 
+// glm
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/norm.hpp>
+
 // Win
 #include <Windows.h>
 #include <assert.h>

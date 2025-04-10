@@ -1,6 +1,11 @@
 #pragma once
 #include "Types.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/norm.hpp>
+
 struct Vertex
 {
 	Vec3 position;
@@ -16,8 +21,8 @@ struct TransformData
 
 struct CircleData 
 {
-	Vec2 center;
+	glm::vec2 center;
 	float radius;
 	float padding;
-	Vec4 color;
+	glm::vec4 color;
 };

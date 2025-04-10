@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "Game.h"
+#include "Circle.h"
 #include "Gaussianblur.h"
 
 Game::Game()
 {
-
 }
 
 Game::~Game()
@@ -18,8 +18,12 @@ void Game::Init(HWND hwnd)
 	_width = GWinSizeX;
 	_height = GWinSizeY;
 
-	// 구 생성
-	circle = make_unique<Circle>(Circle({ 10.0f,10.0f }, 4.0f, { 1.0f,0.f,0.f,1.0f }));
+	// 원 객체 생성
+	_circle = make_unique<Circle>(
+		glm::vec2(_width / 2.0f, _height / 2.0f),  // 화면 중앙
+		_height / 4.0f,                          // 화면 높이의 1/4 크기
+		glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)       // 빨간색
+	);
 
 	CreateDeviceAndSwapChain();		// 뒷편에서 그림을 그리고 메인 화면에 출력
 	CreateRenderTargetView();		// 백 버퍼를 가져와서 이를 렌더 타겟 뷰로 변환
@@ -29,6 +33,9 @@ void Game::Init(HWND hwnd)
 	CreateVS();						// 쉐이더에 있는 정보 vs 정보 넘기기
 	CreateInputLayout();			// CPU에 들어간 데이터를 어떻게 읽어야 하는지
 	CreatePS();						// 쉐이더에 있는 정보 ps 정보 넘기기
+
+	CreateCircleShaders();
+	CreateCircleInputLayout();
 
 	CreateRasterizerState();		//
 	CreateSamplerState();			//
@@ -44,8 +51,7 @@ void Game::Update()
 	_transformData.offset.y += 0.003f;*/
 
 	//gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
-
-	// ImGui 창 생성
+	//circle.DrawCircle(_width, _height, _shaderResourceView, _deviceContext);
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));
@@ -59,7 +65,7 @@ void Game::Update()
 void Game::Render()
 {
 	RenderBegin();
-
+	
 	{
 		uint32 stride = sizeof(Vertex);
 		uint32 offset = 0;
@@ -102,6 +108,34 @@ void Game::Render()
 		 
 		//_deviceContext->Draw(_vertices.size(), 0);
 		// 인덱스 버퍼를 사용해서 그리기 (메모리 효율적)
+		_deviceContext->DrawIndexed(_indices.size(), 0, 0);
+	}
+
+	{
+		uint32 stride = sizeof(Vertex);
+		uint32 offset = 0;
+
+		// IA (셋팅 단계)
+		_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
+		_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		_deviceContext->IASetInputLayout(_circleInputLayout.Get());
+		_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// VS (정점 처리 단계)
+		_deviceContext->VSSetShader(_circleVertexShader.Get(), nullptr, 0);
+
+		// RS (정점을 픽셀로 변환)
+		_deviceContext->RSSetState(_rasterizerState.Get());
+
+		// PS (픽셀 색상 계산)
+		_deviceContext->PSSetShader(_circlePixelShader.Get(), nullptr, 0);
+
+		// Circle 클래스 사용하여 원 그리기
+		_circle->DrawCircle(_width, _height, _shaderResourceView, _deviceContext, _constantBuffer);
+
+		// OM (최종 픽셀 색상 결정)
+		_deviceContext->OMSetBlendState(_blendState.Get(), nullptr, 0xFFFFFFFF);
+
 		_deviceContext->DrawIndexed(_indices.size(), 0, 0);
 	}
 
@@ -219,66 +253,64 @@ void Game::CreateGeometry()
 
 
 	// 이미지 출력하는 코드
+	// VertexData
+	// 정점에 대한 정보(Data) 입력
 	{
-	//	// VertexData
-	//// 정점에 대한 정보(Data) 입력
-	//	{
-	//		_vertices.resize(4);
+		_vertices.resize(4);
 
-	//		_vertices[0].position = Vec3(-0.5f, -0.5f, 0.f);
-	//		_vertices[0].uv = Vec2(0.f, 1.f);
-	//		//_vertices[0].color = Color(1.f, 0.f, 0.f, 1.f);
-	//		_vertices[1].position = Vec3(-0.5f, 0.5f, 0.f);
-	//		_vertices[1].uv = Vec2(0.f, 0.f);
-	//		//_vertices[1].color = Color(1.f, 0.f, 0.f, 1.f);
-	//		_vertices[2].position = Vec3(0.5f, -0.5f, 0.f);
-	//		_vertices[2].uv = Vec2(1.f, 1.f);
-	//		//_vertices[2].color = Color(1.f, 0.f, 0.f, 1.f);
-	//		_vertices[3].position = Vec3(0.5f, 0.5f, 0.f);
-	//		_vertices[3].uv = Vec2(1.f, 0.f);
-	//		//_vertices[3].color = Color(1.f, 0.f, 0.f, 1.f);
-	//	}
-
-	//	// VertexBuffer
-	//	// CPU메모리에 있는 데이터를 GPU메모리에 넘겨줘야하는 작업
-	//	{
-	//		D3D11_BUFFER_DESC desc;
-	//		ZeroMemory(&desc, sizeof(desc));
-	//		desc.Usage = D3D11_USAGE_IMMUTABLE; // 중요 : 어떻게 작업을 할 것인지? GPU만 읽을지 쓸지 정하는 방법 데이터
-	//		//		  처음 생성하면서 읽으면 원점을 수정하지 않기 때문에 읽기만 사용
-	//		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER; // 어떤 방법으로 바인드 할 것인지?
-	//		desc.ByteWidth = (uint32)(sizeof(Vertex) * _vertices.size());
-
-	//		D3D11_SUBRESOURCE_DATA data;
-	//		ZeroMemory(&data, sizeof(data));
-	//		data.pSysMem = _vertices.data(); // CPU의 처음 데이터를 입력
-
-	//		// GPU에 메모리 생성 후 데이터 넘김
-	//		HRESULT hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf());
-	//		CHECK(hr);
-	//	}
-
-	//	// index
-	//	{
-	//		_indices = { 0,1,2,2,1,3 };
-	//	}
-
-	//	// IndexBuffer
-	//	{
-	//		D3D11_BUFFER_DESC desc;
-	//		ZeroMemory(&desc, sizeof(desc));
-	//		desc.Usage = D3D11_USAGE_IMMUTABLE;
-	//		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	//		desc.ByteWidth = (uint32)(sizeof(uint32) * _indices.size());
-
-	//		D3D11_SUBRESOURCE_DATA data;
-	//		ZeroMemory(&data, sizeof(data));
-	//		data.pSysMem = _indices.data();
-
-	//		HRESULT hr = _device->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
-	//		CHECK(hr);
-	//	}
+		_vertices[0].position = Vec3(-0.5f, -0.5f, 0.f);
+		_vertices[0].uv = Vec2(0.f, 1.f);
+		//_vertices[0].color = Color(1.f, 0.f, 0.f, 1.f);
+		_vertices[1].position = Vec3(-0.5f, 0.5f, 0.f);
+		_vertices[1].uv = Vec2(0.f, 0.f);
+		//_vertices[1].color = Color(1.f, 0.f, 0.f, 1.f);
+		_vertices[2].position = Vec3(0.5f, -0.5f, 0.f);
+		_vertices[2].uv = Vec2(1.f, 1.f);
+		//_vertices[2].color = Color(1.f, 0.f, 0.f, 1.f);
+		_vertices[3].position = Vec3(0.5f, 0.5f, 0.f);
+		_vertices[3].uv = Vec2(1.f, 0.f);
+		//_vertices[3].color = Color(1.f, 0.f, 0.f, 1.f);
 	}
+
+	// VertexBuffer
+	// CPU메모리에 있는 데이터를 GPU메모리에 넘겨줘야하는 작업
+	{
+		D3D11_BUFFER_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Usage = D3D11_USAGE_IMMUTABLE; // 중요 : 어떻게 작업을 할 것인지? GPU만 읽을지 쓸지 정하는 방법 데이터
+		//		  처음 생성하면서 읽으면 원점을 수정하지 않기 때문에 읽기만 사용
+		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER; // 어떤 방법으로 바인드 할 것인지?
+		desc.ByteWidth = (uint32)(sizeof(Vertex) * _vertices.size());
+		D3D11_SUBRESOURCE_DATA data;
+		ZeroMemory(&data, sizeof(data));
+		data.pSysMem = _vertices.data(); // CPU의 처음 데이터를 입력
+
+		// GPU에 메모리 생성 후 데이터 넘김
+		HRESULT hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf());
+		CHECK(hr);
+	}
+
+	// index
+	{
+		_indices = { 0,1,2,2,1,3 };
+	}
+
+	// IndexBuffer
+	{
+		D3D11_BUFFER_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Usage = D3D11_USAGE_IMMUTABLE;
+		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		desc.ByteWidth = (uint32)(sizeof(uint32) * _indices.size());
+
+		D3D11_SUBRESOURCE_DATA data;
+		ZeroMemory(&data, sizeof(data));
+		data.pSysMem = _indices.data();
+
+		HRESULT hr = _device->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
+		CHECK(hr);
+	}
+	
 }
 
 void Game::CreateInputLayout()
@@ -293,6 +325,43 @@ void Game::CreateInputLayout()
 	const int32 count = sizeof(layout) / sizeof(D3D11_INPUT_ELEMENT_DESC);
 	// 구현 정점과 쉐이더에 대한 정보 입력을 해야함
 	_device->CreateInputLayout(layout, count, _vsBlob->GetBufferPointer(), _vsBlob->GetBufferSize(), _inputLayout.GetAddressOf());
+}
+
+void Game::CreateCircleShaders()
+{
+	// 버텍스 셰이더 로드
+	LoadShaderFromFile(L"CircleVS.hlsl", "main", "vs_5_0", _circleVSBlob);
+	HRESULT hr = _device->CreateVertexShader(_circleVSBlob->GetBufferPointer(),
+		_circleVSBlob->GetBufferSize(),
+		nullptr,
+		_circleVertexShader.GetAddressOf());
+	CHECK(hr);
+
+	// 픽셀 셰이더 로드
+	LoadShaderFromFile(L"CirclePS.hlsl", "main", "ps_5_0", _circlePSBlob);
+	hr = _device->CreatePixelShader(_circlePSBlob->GetBufferPointer(),
+		_circlePSBlob->GetBufferSize(),
+		nullptr,
+		_circlePixelShader.GetAddressOf());
+	CHECK(hr);
+}
+
+void Game::CreateCircleInputLayout()
+{
+	// 원 셰이더용 입력 레이아웃 설정
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	const int32 count = sizeof(layout) / sizeof(D3D11_INPUT_ELEMENT_DESC);
+
+	_device->CreateInputLayout(layout,
+		count,
+		_circleVSBlob->GetBufferPointer(),
+		_circleVSBlob->GetBufferSize(),
+		_circleInputLayout.GetAddressOf());
 }
 
 void Game::CreateVS()
@@ -370,27 +439,66 @@ void Game::CreateBlendState()
 
 void Game::CreateSRV()
 {
-	DirectX::TexMetadata md;
-	DirectX::ScratchImage img;
+	// 1. 기존 이미지 로드 코드 대신 빈 텍스처 생성
+	D3D11_TEXTURE2D_DESC textureDesc;
+	ZeroMemory(&textureDesc, sizeof(textureDesc));
+	textureDesc.Width = _width;
+	textureDesc.Height = _height;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // 일반적인 색상 포맷
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT; // UpdateSubresource로 업데이트 가능
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
 
-	const wchar_t* filename = L"image_1.jpg";
+	// 2. 초기 데이터 설정 (검은 배경)
+	std::vector<uint32_t> initialData(_width * _height, 0xFF000000); // ARGB 포맷으로 검은색
 
-	HRESULT hr = ::LoadFromWICFile(filename, WIC_FLAGS_NONE, &md, img);
+	D3D11_SUBRESOURCE_DATA subresourceData;
+	ZeroMemory(&subresourceData, sizeof(subresourceData));
+	subresourceData.pSysMem = initialData.data();
+	subresourceData.SysMemPitch = _width * sizeof(uint32_t);
+	subresourceData.SysMemSlicePitch = 0;
+
+	// 3. 텍스처 생성
+	ComPtr<ID3D11Texture2D> texture;
+	HRESULT hr = _device->CreateTexture2D(&textureDesc, &subresourceData, texture.GetAddressOf());
 	CHECK(hr);
 
-	// 픽셀 데이터 추출 가우시안 블러를 적용하기 위한 추가 작업
-	const DirectX::Image* image = img.GetImage(0, 0, 0);
-	if (!image)
-	{
-		std::cout << "not find Image : " << filename << "\n";
-		return;
-	}
+	// 4. 셰이더 리소스 뷰 생성
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	ZeroMemory(&srvDesc, sizeof(srvDesc));
+	srvDesc.Format = textureDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = 1;
 
-	// 픽셀데이터 추출
-	gaussianblur.ProcessPixelDataFromDirectXImage(img, md);
-
-	hr = ::CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
+	hr = _device->CreateShaderResourceView(texture.Get(), &srvDesc, _shaderResourceView.GetAddressOf());
 	CHECK(hr);
+
+	//DirectX::TexMetadata md;
+	//DirectX::ScratchImage img;
+
+	//const wchar_t* filename = L"image_1.jpg";
+
+	//HRESULT hr = ::LoadFromWICFile(filename, WIC_FLAGS_NONE, &md, img);
+	//CHECK(hr);
+
+	//// 픽셀 데이터 추출 가우시안 블러를 적용하기 위한 추가 작업
+	//const DirectX::Image* image = img.GetImage(0, 0, 0);
+	//if (!image)
+	//{
+	//	std::cout << "not find Image : " << filename << "\n";
+	//	return;
+	//}
+
+	//// 픽셀데이터 추출
+	//gaussianblur.ProcessPixelDataFromDirectXImage(img, md);
+
+	//hr = ::CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
+	//CHECK(hr);
 }
 
 void Game::CreateConstantBuffer()

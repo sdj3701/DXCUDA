@@ -1,17 +1,17 @@
 struct VSInput
 {
-    float4 position : POSITIONT;
-    float2 uv : TEXTCOORD;
+    float4 position : POSITION;
+    float2 uv : TEXCOORD;
 };
 
 struct VSOutput
 {
     float4 position : SV_POSITION;
-    float2 uv : TEXTCOORD;
+    float2 uv : TEXCOORD;
 };
 
 
-float4 main(VSInput vsInput) 
+VSOutput main(VSInput vsInput)
 {
     VSOutput vsOutput;
     

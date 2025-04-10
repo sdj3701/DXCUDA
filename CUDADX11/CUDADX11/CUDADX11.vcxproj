@@ -170,6 +170,18 @@
     <None Include="Graphics.cu" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="CirclePS.hlsl">
+      <DisableOptimizations Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DisableOptimizations>
+      <EnableDebuggingInformation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</EnableDebuggingInformation>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="CircleVS.hlsl">
+      <DisableOptimizations Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DisableOptimizations>
+      <EnableDebuggingInformation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</EnableDebuggingInformation>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Default.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>

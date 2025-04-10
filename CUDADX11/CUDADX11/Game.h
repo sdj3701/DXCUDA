@@ -35,6 +35,11 @@ private:
 private:
 	void CreateGeometry();
 	void CreateInputLayout();
+	
+	// 원 추가
+	void CreateCircleShaders();
+	void CreateCircleInputLayout();
+
 	void CreateVS();
 	void CreatePS();
 
@@ -54,7 +59,8 @@ private:
 	uint32 _width = 0;
 	uint32 _height = 0;
 	Gaussianblur gaussianblur;
-	unique_ptr<Circle> circle;
+	// 원 객체
+	std::unique_ptr<Circle> _circle;
 	
 
 private:
@@ -75,20 +81,25 @@ private:
 	vector<Vertex> _vertices;
 	ComPtr<ID3D11Buffer> _vertexBuffer = nullptr;
 	ComPtr<ID3D11InputLayout> _inputLayout = nullptr;
+	ComPtr<ID3D11InputLayout> _circleInputLayout = nullptr;
 
 	vector<uint32> _indices;
 	ComPtr<ID3D11Buffer> _indexBuffer = nullptr;
 
 	// VS
 	ComPtr<ID3D11VertexShader> _vertexShader = nullptr;
+	ComPtr<ID3D11VertexShader> _circleVertexShader = nullptr;
 	ComPtr<ID3DBlob> _vsBlob = nullptr;
+	ComPtr<ID3DBlob> _circleVSBlob = nullptr;
 
 	// RS
 	ComPtr<ID3D11RasterizerState> _rasterizerState = nullptr;
 
 	// PS
 	ComPtr<ID3D11PixelShader> _pixelShader = nullptr;
+	ComPtr<ID3D11PixelShader> _circlePixelShader = nullptr;
 	ComPtr<ID3DBlob> _psBlob = nullptr;
+	ComPtr<ID3DBlob> _circlePSBlob = nullptr;
 
 	// SV
 	ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
