@@ -53,6 +53,8 @@ void Game::Update()
 	//gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
 	//circle.DrawCircle(_width, _height, _shaderResourceView, _deviceContext);
 
+	_circle->UpdateCircleData();
+
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));
 
@@ -79,14 +81,15 @@ void Game::Render()
 		
 		// 정점 데이터 구조 정의 (위치, uv 좌표)
 		_deviceContext->IASetInputLayout(_inputLayout.Get());
+		_deviceContext->IASetInputLayout(_circleInputLayout.Get());
 		
 		// 삼각형 리스트로 그리기 설정
 		_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		
+				
 		// VS (정점 처리 단계)
 		// 버텍스 셰이더 설정
 		_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
+		_deviceContext->VSSetShader(_circleVertexShader.Get(), nullptr, 0);
 		// 변환 행렬 등 상수 버퍼 설정
 		_deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer.GetAddressOf());
 		
@@ -97,45 +100,20 @@ void Game::Render()
 		// PS (픽셀 색상 계산)
 		// 픽셀 셰이더 설정
 		_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+		_deviceContext->PSSetShader(_circlePixelShader.Get(), nullptr, 0);
 		// 텍스처 리소스 설정 (이미지 데이터)
 		_deviceContext->PSSetShaderResources(0, 1, _shaderResourceView.GetAddressOf());
 		// 샘플러 상태 설정 (텍스처 필터링 방법)
 		_deviceContext->PSSetSamplers(0, 1, _samplerState.GetAddressOf());
 
+		_circle->DrawCircle(_width, _height, _shaderResourceView, _deviceContext, _constantBuffer);
+		
 		// OM (최종 픽셀 색상 결정)
 		//블렌드 상태 설정 (투명도 처리 방법)
 		_deviceContext->OMSetBlendState(_blendState.Get(), nullptr, 0xFFFFFFFF);
 		 
 		//_deviceContext->Draw(_vertices.size(), 0);
 		// 인덱스 버퍼를 사용해서 그리기 (메모리 효율적)
-		_deviceContext->DrawIndexed(_indices.size(), 0, 0);
-	}
-
-	{
-		uint32 stride = sizeof(Vertex);
-		uint32 offset = 0;
-
-		// IA (셋팅 단계)
-		_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
-		_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		_deviceContext->IASetInputLayout(_circleInputLayout.Get());
-		_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// VS (정점 처리 단계)
-		_deviceContext->VSSetShader(_circleVertexShader.Get(), nullptr, 0);
-
-		// RS (정점을 픽셀로 변환)
-		_deviceContext->RSSetState(_rasterizerState.Get());
-
-		// PS (픽셀 색상 계산)
-		_deviceContext->PSSetShader(_circlePixelShader.Get(), nullptr, 0);
-
-		// Circle 클래스 사용하여 원 그리기
-		_circle->DrawCircle(_width, _height, _shaderResourceView, _deviceContext, _constantBuffer);
-
-		// OM (최종 픽셀 색상 결정)
-		_deviceContext->OMSetBlendState(_blendState.Get(), nullptr, 0xFFFFFFFF);
-
 		_deviceContext->DrawIndexed(_indices.size(), 0, 0);
 	}
 
@@ -258,16 +236,16 @@ void Game::CreateGeometry()
 	{
 		_vertices.resize(4);
 
-		_vertices[0].position = Vec3(-0.5f, -0.5f, 0.f);
+		_vertices[0].position = Vec3(-1.f, -1.f, 0.f);
 		_vertices[0].uv = Vec2(0.f, 1.f);
 		//_vertices[0].color = Color(1.f, 0.f, 0.f, 1.f);
-		_vertices[1].position = Vec3(-0.5f, 0.5f, 0.f);
+		_vertices[1].position = Vec3(-1.f, 1.f, 0.f);
 		_vertices[1].uv = Vec2(0.f, 0.f);
 		//_vertices[1].color = Color(1.f, 0.f, 0.f, 1.f);
-		_vertices[2].position = Vec3(0.5f, -0.5f, 0.f);
+		_vertices[2].position = Vec3(1.f, -1.f, 0.f);
 		_vertices[2].uv = Vec2(1.f, 1.f);
 		//_vertices[2].color = Color(1.f, 0.f, 0.f, 1.f);
-		_vertices[3].position = Vec3(0.5f, 0.5f, 0.f);
+		_vertices[3].position = Vec3(1.f, 1.f, 0.f);
 		_vertices[3].uv = Vec2(1.f, 0.f);
 		//_vertices[3].color = Color(1.f, 0.f, 0.f, 1.f);
 	}
@@ -278,7 +256,7 @@ void Game::CreateGeometry()
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.Usage = D3D11_USAGE_IMMUTABLE; // 중요 : 어떻게 작업을 할 것인지? GPU만 읽을지 쓸지 정하는 방법 데이터
-		//		  처음 생성하면서 읽으면 원점을 수정하지 않기 때문에 읽기만 사용
+		// 처음 생성하면서 읽으면 원점을 수정하지 않기 때문에 읽기만 사용
 		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER; // 어떤 방법으로 바인드 할 것인지?
 		desc.ByteWidth = (uint32)(sizeof(Vertex) * _vertices.size());
 		D3D11_SUBRESOURCE_DATA data;

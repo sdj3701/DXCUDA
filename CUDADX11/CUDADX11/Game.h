@@ -58,6 +58,8 @@ private:
 	HWND _hwnd;
 	uint32 _width = 0;
 	uint32 _height = 0;
+
+public:
 	Gaussianblur gaussianblur;
 	// ¿ø °´Ã¼
 	std::unique_ptr<Circle> _circle;
