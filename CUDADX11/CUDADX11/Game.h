@@ -78,6 +78,8 @@ private:
 	D3D11_VIEWPORT _viewport = { 0 };
 	float _clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
 
+	ComPtr<ID3D11Texture2D> _texture = nullptr;
+
 private:
 	// Geometry
 	vector<Vertex> _vertices;

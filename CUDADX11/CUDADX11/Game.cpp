@@ -33,9 +33,9 @@ void Game::Init(HWND hwnd)
 	CreateVS();						// 쉐이더에 있는 정보 vs 정보 넘기기
 	CreateInputLayout();			// CPU에 들어간 데이터를 어떻게 읽어야 하는지
 	CreatePS();						// 쉐이더에 있는 정보 ps 정보 넘기기
-
-	CreateCircleShaders();
-	CreateCircleInputLayout();
+	
+	CreateCircleShaders();			// Circle 쉐이더 VS,PS 정보 넘기기
+	CreateCircleInputLayout();		// Circle의 데이터를 어떻게 읽어야 하는지
 
 	CreateRasterizerState();		//
 	CreateSamplerState();			//
@@ -51,17 +51,40 @@ void Game::Update()
 	_transformData.offset.y += 0.003f;*/
 
 	//gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
-	//circle.DrawCircle(_width, _height, _shaderResourceView, _deviceContext);
 
-	_circle->UpdateCircleData();
+	std::vector<uint32_t> pixels(_width * _height, 0xFF808080); // 회색 배경
 
-	D3D11_MAPPED_SUBRESOURCE subResource;
-	ZeroMemory(&subResource, sizeof(subResource));
+	for (int j = 0; j < _height; j++)
+		for (int i = 0; i < _width; i++)
+		{
+			if (_circle->IsInside(glm::vec2{ i, j }))
+			{
+				// ARGB 포맷으로 변환 (원의 색상을 uint32_t로 변환)
+				glm::vec4 color = _circle->_color;
+				uint32_t argb =
+					(uint32_t(color.w * 255.0f) << 24) | // Alpha
+					(uint32_t(color.z * 255.0f) << 16) | // Blue
+					(uint32_t(color.y * 255.0f) << 8) |  // Green
+					uint32_t(color.x * 255.0f);          // Red
 
-	_deviceContext->Map(_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource);
-	::memcpy(subResource.pData, &_transformData, sizeof(_transformData));
-	_deviceContext->Unmap(_constantBuffer.Get(), 0);
+				pixels[i + _width * j] = argb;
+			}
+		}
+	// 원 그리기
 
+	// 텍스처 업데이트
+	D3D11_MAPPED_SUBRESOURCE ms;
+	_deviceContext->Map(_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+	memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(uint32_t));
+	_deviceContext->Unmap(_texture.Get(), 0);
+
+	// TODO : 일단 상수 버퍼 사용안함
+	//D3D11_MAPPED_SUBRESOURCE subResource;
+	//ZeroMemory(&subResource, sizeof(subResource));
+
+	//_deviceContext->Map(_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource);
+	//::memcpy(subResource.pData, &_transformData, sizeof(_transformData));
+	//_deviceContext->Unmap(_constantBuffer.Get(), 0);
 }
 
 void Game::Render()
@@ -228,9 +251,7 @@ void Game::SetViewport()
 
 void Game::CreateGeometry()
 {
-
-
-	// 이미지 출력하는 코드
+	// 이미지 출력하는 코드 (Canvas)
 	// VertexData
 	// 정점에 대한 정보(Data) 입력
 	{
@@ -419,18 +440,18 @@ void Game::CreateSRV()
 {
 	// 1. 기존 이미지 로드 코드 대신 빈 텍스처 생성
 	D3D11_TEXTURE2D_DESC textureDesc;
-	ZeroMemory(&textureDesc, sizeof(textureDesc));
-	textureDesc.Width = _width;
-	textureDesc.Height = _height;
-	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // 일반적인 색상 포맷
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT; // UpdateSubresource로 업데이트 가능
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = 0;
+    ZeroMemory(&textureDesc, sizeof(textureDesc));
+    textureDesc.Width = _width;
+    textureDesc.Height = _height;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // 일반적인 색상 포맷
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.SampleDesc.Quality = 0;
+    textureDesc.Usage = D3D11_USAGE_DYNAMIC; // CPU에서 쓰기 위해 DYNAMIC으로 변경
+    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // CPU 쓰기 접근 허용
+    textureDesc.MiscFlags = 0;
 
 	// 2. 초기 데이터 설정 (검은 배경)
 	std::vector<uint32_t> initialData(_width * _height, 0xFF000000); // ARGB 포맷으로 검은색
@@ -442,8 +463,7 @@ void Game::CreateSRV()
 	subresourceData.SysMemSlicePitch = 0;
 
 	// 3. 텍스처 생성
-	ComPtr<ID3D11Texture2D> texture;
-	HRESULT hr = _device->CreateTexture2D(&textureDesc, &subresourceData, texture.GetAddressOf());
+	HRESULT hr = _device->CreateTexture2D(&textureDesc, &subresourceData, _texture.GetAddressOf());
 	CHECK(hr);
 
 	// 4. 셰이더 리소스 뷰 생성
@@ -453,7 +473,7 @@ void Game::CreateSRV()
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 
-	hr = _device->CreateShaderResourceView(texture.Get(), &srvDesc, _shaderResourceView.GetAddressOf());
+	hr = _device->CreateShaderResourceView(_texture.Get(), &srvDesc, _shaderResourceView.GetAddressOf());
 	CHECK(hr);
 
 	//DirectX::TexMetadata md;
