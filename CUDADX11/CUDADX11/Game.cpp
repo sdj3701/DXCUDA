@@ -2,8 +2,11 @@
 #include "Game.h"
 #include "Circle.h"
 #include "Gaussianblur.h"
+//#include "Raytracer.h"
+
 
 Game::Game()
+	: raytracer(GWinSizeX, GWinSizeY)
 {
 }
 
@@ -24,6 +27,8 @@ void Game::Init(HWND hwnd)
 		_height / 4.0f,                          // 화면 높이의 1/4 크기
 		glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)       // 빨간색
 	);
+
+	
 
 	CreateDeviceAndSwapChain();		// 뒷편에서 그림을 그리고 메인 화면에 출력
 	CreateRenderTargetView();		// 백 버퍼를 가져와서 이를 렌더 타겟 뷰로 변환
@@ -52,31 +57,26 @@ void Game::Update()
 
 	//gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
 
-	std::vector<uint32_t> pixels(_width * _height, 0xFF808080); // 회색 배경
+	std::vector<glm::vec4> pixels(_width * _height, glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
 
-	for (int j = 0; j < _height; j++)
-		for (int i = 0; i < _width; i++)
-		{
-			if (_circle->IsInside(glm::vec2{ i, j }))
-			{
-				// ARGB 포맷으로 변환 (원의 색상을 uint32_t로 변환)
-				glm::vec4 color = _circle->_color;
-				uint32_t argb =
-					(uint32_t(color.w * 255.0f) << 24) | // Alpha
-					(uint32_t(color.z * 255.0f) << 16) | // Blue
-					(uint32_t(color.y * 255.0f) << 8) |  // Green
-					uint32_t(color.x * 255.0f);          // Red
-
-				pixels[i + _width * j] = argb;
-			}
-		}
 	// 원 그리기
+	//for (int j = 0; j < _height; j++) {
+	//	for (int i = 0; i < _width; i++) {
+	//		if (_circle->IsInside(glm::vec2{ i, j })) {
+	//			pixels[i + _width * j] = _circle->_color; // 직접 vec4 색상 사용
+	//		}
+	//	}
+	//}
+
+	raytracer.Render(pixels);
 
 	// 텍스처 업데이트
 	D3D11_MAPPED_SUBRESOURCE ms;
-	_deviceContext->Map(_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-	memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(uint32_t));
-	_deviceContext->Unmap(_texture.Get(), 0);
+	HRESULT hr = _deviceContext->Map(_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+	if (SUCCEEDED(hr)) {
+		memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(glm::vec4));
+		_deviceContext->Unmap(_texture.Get(), 0);
+	}
 
 	// TODO : 일단 상수 버퍼 사용안함
 	//D3D11_MAPPED_SUBRESOURCE subResource;
@@ -445,7 +445,7 @@ void Game::CreateSRV()
     textureDesc.Height = _height;
     textureDesc.MipLevels = 1;
     textureDesc.ArraySize = 1;
-    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // 일반적인 색상 포맷
+    textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT; // 일반적인 색상 포맷
     textureDesc.SampleDesc.Count = 1;
     textureDesc.SampleDesc.Quality = 0;
     textureDesc.Usage = D3D11_USAGE_DYNAMIC; // CPU에서 쓰기 위해 DYNAMIC으로 변경
@@ -454,7 +454,7 @@ void Game::CreateSRV()
     textureDesc.MiscFlags = 0;
 
 	// 2. 초기 데이터 설정 (검은 배경)
-	std::vector<uint32_t> initialData(_width * _height, 0xFF000000); // ARGB 포맷으로 검은색
+	std::vector<glm::vec4> initialData(_width * _height, glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
 
 	D3D11_SUBRESOURCE_DATA subresourceData;
 	ZeroMemory(&subresourceData, sizeof(subresourceData));

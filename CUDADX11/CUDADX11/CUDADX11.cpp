@@ -69,9 +69,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             // ImGui UI 코드
             ImGui::Begin("Hello ImGui");
-            ImGui::SliderFloat2("Center", &game._circle->center.x, 0.0f, float(game.GetWidth() - 1.0f));
-            ImGui::SliderFloat("Radius", &game._circle->radius, 0.0f, float(game.GetWidth() - 1.0f));
-            ImGui::SliderFloat3("RGB", &game._circle->_color.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("Center", &game.raytracer.sphere->center.x, -1.0f, 1.0f);
+            ImGui::SliderFloat("Radius", &game.raytracer.sphere->radius, 0.0f, 1.0f);
+            ImGui::SliderFloat3("RGB", &game.raytracer.sphere->color.x, 0.0f, 1.0f);
             ImGui::End();
 
             game.Update();

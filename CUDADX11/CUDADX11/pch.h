@@ -25,6 +25,7 @@ using namespace std;
 #include <glm/gtx/norm.hpp>
 
 // Win
+#define NOMINMAX
 #include <Windows.h>
 #include <assert.h>
 // 가속 멀티쓰레딩

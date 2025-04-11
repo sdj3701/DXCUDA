@@ -36,6 +36,9 @@
     <Filter Include="Source Files\56. Object\Shpere\Circle">
       <UniqueIdentifier>{9e434432-df43-4033-acb3-2afaee51d77e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\57. Ray,Hit">
+      <UniqueIdentifier>{a6105872-6a6c-41e5-af1b-0b6ff25be039}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CUDADX11.h">
@@ -74,6 +77,18 @@
     <ClInclude Include="Circle.h">
       <Filter>Source Files\56. Object\Shpere\Circle</Filter>
     </ClInclude>
+    <ClInclude Include="Hit.h">
+      <Filter>Source Files\57. Ray,Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Source Files\57. Ray,Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="Raytracer.h">
+      <Filter>Source Files\57. Ray,Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>Source Files\56. Object\Shpere</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CUDADX11.rc">
@@ -106,6 +121,15 @@
     </ClCompile>
     <ClCompile Include="Circle.cpp">
       <Filter>Source Files\56. Object\Shpere\Circle</Filter>
+    </ClCompile>
+    <ClCompile Include="Raytracer.cpp">
+      <Filter>Source Files\57. Ray,Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>Source Files\56. Object\Shpere</Filter>
+    </ClCompile>
+    <ClCompile Include="Hit.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

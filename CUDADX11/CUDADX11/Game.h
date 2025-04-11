@@ -1,6 +1,7 @@
 #pragma once
 #include "Gaussianblur.h"
 #include "Circle.h"
+#include "Raytracer.h"
 
 class Game
 {
@@ -63,7 +64,7 @@ public:
 	Gaussianblur gaussianblur;
 	// ¿ø °´Ã¼
 	std::unique_ptr<Circle> _circle;
-	
+	Raytracer raytracer;
 
 private:
 	// Device & SwapChain

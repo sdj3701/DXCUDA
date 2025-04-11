@@ -20,7 +20,7 @@ public:
 		circleData.padding = 0.0f;
 		circleData.color = color;
 	}
-
+	
 	void DrawCircle(int width,int height , ComPtr<ID3D11ShaderResourceView>& _shaderResourceView, ComPtr<ID3D11DeviceContext>& _deviceContext, ComPtr<ID3D11Buffer>& constantBuffer);
 	bool IsInside(const glm::vec2& x);
 };
