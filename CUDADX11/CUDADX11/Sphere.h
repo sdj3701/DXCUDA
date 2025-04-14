@@ -14,6 +14,7 @@ public:
     {
     }
 
+    // 원 안에 출동을 했는지 확인 
     Hit IntersectRayCollision(Ray& ray)
     {
         Hit hit = Hit{ -1.0f, glm::vec3(0.0f), glm::vec3(0.0f) }; // d가 음수이면 충돌을 안한 것으로 가정

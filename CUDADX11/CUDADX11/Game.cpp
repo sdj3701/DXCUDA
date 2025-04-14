@@ -2,9 +2,8 @@
 #include "Game.h"
 #include "Circle.h"
 #include "Gaussianblur.h"
-//#include "Raytracer.h"
 
-
+// 헤더에서 raytracer를 선언 한걸 초기화 해줘야함
 Game::Game()
 	: raytracer(GWinSizeX, GWinSizeY)
 {
@@ -27,8 +26,6 @@ void Game::Init(HWND hwnd)
 		_height / 4.0f,                          // 화면 높이의 1/4 크기
 		glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)       // 빨간색
 	);
-
-	
 
 	CreateDeviceAndSwapChain();		// 뒷편에서 그림을 그리고 메인 화면에 출력
 	CreateRenderTargetView();		// 백 버퍼를 가져와서 이를 렌더 타겟 뷰로 변환
@@ -68,6 +65,7 @@ void Game::Update()
 	//	}
 	//}
 
+	// 구 렌더링 해줌 각 픽셀로
 	raytracer.Render(pixels);
 
 	// 텍스처 업데이트

@@ -12,6 +12,7 @@ glm::vec3 Raytracer::TransformScreenToWorld(glm::vec2 posScreen)
 
 glm::vec3 Raytracer::traceRay(Ray& ray)
 {
+	// 충돌 판정
 	const Hit hit = sphere->IntersectRayCollision(ray);
 
 	if (hit.d < 0.0f)
@@ -31,6 +32,7 @@ void Raytracer::Render(vector<glm::vec4>& pixels)
 	for (int j = 0; j < height; j++)
 		for (int i = 0; i < width; i++)
 		{
+			// 2D를 3D로 투영 반환
 			const glm::vec3 pixelPosWorld = TransformScreenToWorld(glm::vec2(i, j));
 
 			// 광선의 방향 벡터
