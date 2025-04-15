@@ -7,10 +7,15 @@ class Sphere
 public:
     glm::vec3 center;
     float radius;
-    glm::vec3 color; // 뒤에서 '재질(material)'로 확장
+    glm::vec3 amb = glm::vec3(0.0f);
+    glm::vec3 diff = glm::vec3(0.0f);
+    glm::vec3 spec = glm::vec3(0.0f);
+    float alpha = 0.0f;
+    float ks = 0.0f;
 
-    Sphere(const glm::vec3& center, const float radius, const glm::vec3& color)
-        : center(center), color(color), radius(radius)
+
+    Sphere(const glm::vec3& center, const float radius)
+        : center(center), radius(radius)
     {
     }
 

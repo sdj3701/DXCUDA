@@ -21,7 +21,20 @@ glm::vec3 Raytracer::traceRay(Ray& ray)
 	}
 	else
 	{
-		return sphere->color * hit.d; // 깊이를 곱해서 입체감 만들기
+		// 여기서 퐁 모델(Phong reflection model)으로 조명 효과 계산!
+		// 참고 자료
+		// https://en.wikipedia.org/wiki/Phong_reflection_model
+		// https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF
+
+		// Diffuse
+		const glm::vec3 dirToLight = glm::normalize(light.pos - hit.point);
+		const float diff = glm::max(glm::dot(hit.normal, dirToLight), 0.0f);
+
+		// Specular
+		const glm::vec3 reflectDir = 2.0f * dot(hit.normal, dirToLight) * hit.normal - dirToLight;// r = 2 (n dot l) n - l
+		const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), sphere->alpha);
+
+		return sphere->amb + sphere->diff * diff + sphere->spec * specular * sphere->ks;//sphere->color * hit.d; // 깊이를 곱해서 입체감 만들기
 	}
 }
 

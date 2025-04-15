@@ -89,6 +89,9 @@
     <ClInclude Include="Sphere.h">
       <Filter>Source Files\56. Object\Shpere</Filter>
     </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Source Files\57. Ray,Hit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CUDADX11.rc">
@@ -128,8 +131,11 @@
     <ClCompile Include="Sphere.cpp">
       <Filter>Source Files\56. Object\Shpere</Filter>
     </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files\57. Ray,Hit</Filter>
+    </ClCompile>
     <ClCompile Include="Hit.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\57. Ray,Hit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
