@@ -1,57 +1,36 @@
-#pragma once
-#include "Hit.h"
-#include "Ray.h"
+ï»¿#pragma once
+#include "Object.h"
 
-class Sphere
+class Sphere : public Object
 {
 public:
     glm::vec3 center;
     float radius;
-    glm::vec3 amb = glm::vec3(0.0f);
-    glm::vec3 diff = glm::vec3(0.0f);
-    glm::vec3 spec = glm::vec3(0.0f);
-    float alpha = 0.0f;
-    float ks = 0.0f;
 
+    Sphere(const glm::vec3& center, const float radius, const glm::vec3& color)
+        : center(center), radius(radius), Object(color)
+    {}
 
-    Sphere(const glm::vec3& center, const float radius)
-        : center(center), radius(radius)
+    // Wikipedia Lineâ€“sphere intersection
+    // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
+    // ì› ì•ˆì— ì¶œë™ì„ í–ˆëŠ”ì§€ í™•ì¸ 
+    Hit CheckRayCollision(Ray& ray)
     {
-    }
+        Hit hit = Hit{ -1.0f, glm::vec3(0.0f), glm::vec3(0.0f) };
 
-    // ¿ø ¾È¿¡ Ãâµ¿À» Çß´ÂÁö È®ÀÎ 
-    Hit IntersectRayCollision(Ray& ray)
-    {
-        Hit hit = Hit{ -1.0f, glm::vec3(0.0f), glm::vec3(0.0f) }; // d°¡ À½¼öÀÌ¸é Ãæµ¹À» ¾ÈÇÑ °ÍÀ¸·Î °¡Á¤
+        // const double a = glm::dot(ray.dir_, ray.dir_); // dirì´ unit vectorë¼ë©´ aëŠ” 1.0
+        const float b = 2.0f * glm::dot(ray.dir, ray.start - this->center);
+        const float c = dot(ray.start - this->center, ray.start - this->center) - this->radius * this->radius;
 
-        /*
-         * hit.d = ... // ±¤¼±ÀÇ ½ÃÀÛÁ¡À¸·ÎºÎÅÍ Ãæµ¹ÁöÁ¡±îÁöÀÇ °Å¸® (float)
-         * hit.point = ... // ±¤¼±°ú ±¸°¡ Ãæµ¹ÇÑ ÁöÁ¡ÀÇ À§Ä¡ (vec3)
-         * hit.normal = .. // Ãæµ¹ ÁöÁ¡¿¡¼­ ±¸ÀÇ ´ÜÀ§ ¹ı¼± º¤ÅÍ(unit normal vector)
-         */
-
-        const float b = 2.0f * glm::dot(ray.dir, ray.start - center);
-        const float c = dot(ray.start - center, ray.start - center) - radius * radius;
-        const float nabla = b * b / 4.0f - c;
-
-        //hit.d = 
-        if (nabla >= 0.0f) // Ãæµ¹ ÁöÁ¡ÀÌ 0°³ÀÎ °æ¿ì (±×¸± ÇÊ¿ä X)
+        const float det = b * b - 4.0f * c;
+        if (det >= 0.0f)
         {
-            const float d1 = -b / 2.0f + sqrt(nabla);
-            const float d2 = -b / 2.0f - sqrt(nabla);
+            const float d1 = (-b - sqrt(det)) / 2.0f;
+            const float d2 = (-b + sqrt(det)) / 2.0f;
             hit.d = glm::min(d1, d2);
-            hit.point = ray.start + ray.dir - hit.d;
+            hit.point = ray.start + ray.dir * hit.d;
             hit.normal = glm::normalize(hit.point - this->center);
         }
-        else if (nabla == 0.0f) // Ãæµ¹ ÁöÁ¡ÀÌ 1°³ÀÎ °æ¿ì (²ÀÁöÁ¡)
-        {
-
-        }
-        else if (nabla > 0.0f) // Ãæµ¹ ÁöÁ¡ÀÌ 2°³ÀÎ °æ¿ì (°üµ¿ÇÑ °æ¿ì)
-        {
-
-        }
-        // const float a = glm::dot(ray.dir, ray.dir); // dirÀÌ unit vector¶ó¸é a´Â 1.0f¶ó¼­ »ı·« °¡´É
 
         return hit;
     }
