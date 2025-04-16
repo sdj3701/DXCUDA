@@ -11,9 +11,10 @@ public:
     glm::vec3 spec = glm::vec3(0.0f);
     float alpha = 10.0f;
 
-    Object(const glm::vec3 &color)
+    Object(const vec3& color = { 1.0f, 1.0f, 1.0f })
         : amb(color), dif(color), spec(color)
-    {}
+    {
+    }
 
     virtual Hit CheckRayCollision(Ray& ray) = 0;
 };

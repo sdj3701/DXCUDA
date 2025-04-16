@@ -39,6 +39,9 @@
     <Filter Include="Source Files\57. Ray,Hit">
       <UniqueIdentifier>{a6105872-6a6c-41e5-af1b-0b6ff25be039}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\56. Object\Triangle">
+      <UniqueIdentifier>{1985e026-c541-4ea9-96b4-8e4e2f87cc17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CUDADX11.h">
@@ -92,6 +95,9 @@
     <ClInclude Include="Light.h">
       <Filter>Source Files\57. Ray,Hit</Filter>
     </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>Source Files\56. Object\Triangle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CUDADX11.rc">
@@ -136,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="Hit.cpp">
       <Filter>Source Files\57. Ray,Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>Source Files\56. Object\Triangle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

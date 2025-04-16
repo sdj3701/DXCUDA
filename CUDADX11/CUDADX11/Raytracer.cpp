@@ -59,7 +59,7 @@ void Raytracer::Render(vector<glm::vec4>& pixels)
 
 			// index에는 size_t형 사용 (index가 음수일 수는 없으니까)
 			// traceRay()의 반환형은 vec3 (RGB), A는 불필요
-			pixels[size_t(i + width * j)] = glm::vec4(traceRay(pixelRay), 1.0f);
+			pixels[i + width * j] = vec4(glm::clamp(traceRay(pixelRay), 0.0f, 1.0f), 1.0f);
 		}
 }
 

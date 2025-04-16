@@ -7,14 +7,14 @@ public:
     glm::vec3 center;
     float radius;
 
-    Sphere(const glm::vec3& center, const float radius, const glm::vec3& color)
+    Sphere(const glm::vec3& center, const float radius, const glm::vec3& color = vec3(1.0f))
         : center(center), radius(radius), Object(color)
     {}
 
     // Wikipedia Line–sphere intersection
     // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
     // 원 안에 출동을 했는지 확인 
-    Hit CheckRayCollision(Ray& ray)
+    virtual Hit CheckRayCollision(Ray& ray)
     {
         Hit hit = Hit{ -1.0f, glm::vec3(0.0f), glm::vec3(0.0f) };
 

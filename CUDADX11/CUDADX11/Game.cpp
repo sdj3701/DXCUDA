@@ -20,12 +20,12 @@ void Game::Init(HWND hwnd)
 	_width = GWinSizeX;
 	_height = GWinSizeY;
 
-	// 원 객체 생성
-	_circle = make_unique<Circle>(
-		glm::vec2(_width / 2.0f, _height / 2.0f),  // 화면 중앙
-		_height / 4.0f,                          // 화면 높이의 1/4 크기
-		glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)       // 빨간색
-	);
+	//// 원 객체 생성
+	//_circle = make_unique<Circle>(
+	//	glm::vec2(_width / 2.0f, _height / 2.0f),  // 화면 중앙
+	//	_height / 4.0f,                          // 화면 높이의 1/4 크기
+	//	glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)       // 빨간색
+	//);
 
 	CreateDeviceAndSwapChain();		// 뒷편에서 그림을 그리고 메인 화면에 출력
 	CreateRenderTargetView();		// 백 버퍼를 가져와서 이를 렌더 타겟 뷰로 변환
@@ -54,7 +54,7 @@ void Game::Update()
 
 	//gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
 
-	std::vector<glm::vec4> pixels(_width * _height, glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+	//std::vector<glm::vec4> pixels(_width * _height, glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
 
 	// 원 그리기
 	//for (int j = 0; j < _height; j++) {
@@ -64,17 +64,24 @@ void Game::Update()
 	//		}
 	//	}
 	//}
+	static int count = 0;
+	if (count == 0) // 한 번만 렌더링
+	{
+		vector<glm::vec4>pixels;
+		pixels.resize(raytracer.width * raytracer.height);
+		// 구 렌더링 해줌 각 픽셀로
+		raytracer.Render(pixels);
 
-	// 구 렌더링 해줌 각 픽셀로
-	raytracer.Render(pixels);
-
-	// 텍스처 업데이트
-	D3D11_MAPPED_SUBRESOURCE ms;
-	HRESULT hr = _deviceContext->Map(_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-	if (SUCCEEDED(hr)) {
-		memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(glm::vec4));
-		_deviceContext->Unmap(_texture.Get(), 0);
+		// 텍스처 업데이트
+		D3D11_MAPPED_SUBRESOURCE ms;
+		HRESULT hr = _deviceContext->Map(_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		if (SUCCEEDED(hr)) {
+			memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(glm::vec4));
+			_deviceContext->Unmap(_texture.Get(), 0);
+		}
 	}
+	count++;
+
 
 	// TODO : 일단 상수 버퍼 사용안함
 	//D3D11_MAPPED_SUBRESOURCE subResource;

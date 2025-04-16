@@ -1,6 +1,9 @@
 #pragma once
+
 #include "Sphere.h"
+#include "Ray.h"
 #include "Light.h"
+#include "Triangle.h"
 
 class Raytracer
 {
@@ -12,30 +15,22 @@ public:
 	Raytracer(const uint32_t& width, const uint32_t& height)
 		: width(width), height(height)
 	{
-		// 스크린으로부터 거리가 다른 구 3개
-		auto sphere1 = make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 0.5f), 0.4f, glm::vec3(0.5f, 0.5f, 0.5f));
-		auto sphere2 = make_shared<Sphere>(glm::vec3(0.0f, 0.0f, 1.0f), 0.4f, glm::vec3(0.5f, 0.5f, 0.5f));
-		auto sphere3 = make_shared<Sphere>(glm::vec3(-0.5f, 0.0f, 1.5f), 0.4f, glm::vec3(0.5f, 0.5f, 0.5f));
+		auto sphere1 = make_shared<Sphere>(vec3(0.6f, 0.0f, 0.5f), 0.4f);
+		sphere1->amb = vec3(0.1f);
+		sphere1->dif = vec3(1.0f, 0.1f, 0.1f);
+		sphere1->spec = vec3(1.0f);
+		sphere1->alpha = 50.0f;
 
-		sphere1->amb = glm::vec3(0.2f);
-		sphere1->dif = glm::vec3(1.0f, 0.2f, 0.2f);
-		sphere1->spec = glm::vec3(0.5f);
-		sphere1->alpha = 10.0f;
-
-		sphere2->amb = glm::vec3(0.2f);
-		sphere2->dif = glm::vec3(0.2f, 1.0f, 0.2f);
-		sphere2->spec = glm::vec3(0.5f);
-		sphere2->alpha = 10.0f;
-
-		sphere3->amb = glm::vec3(0.2f);
-		sphere3->dif = glm::vec3(0.2f, 0.2f, 1.0f);
-		sphere3->spec = glm::vec3(0.5f);
-		sphere3->alpha = 10.0f;
-
-		// 일부러 역순으로 추가
-		objects.push_back(sphere3);
-		objects.push_back(sphere2);
 		objects.push_back(sphere1);
+
+		auto triangle1 = make_shared<Triangle>(vec3(-2.0f, -2.0f, 2.0f), vec3(-2.0f, 2.0f, 2.0f), vec3(2.0f, 2.0f, 2.0f));
+
+		triangle1->amb = vec3(0.2f);
+		triangle1->dif = vec3(0.5f);
+		triangle1->spec = vec3(0.5f);
+		triangle1->alpha = 5.0f;
+
+		objects.push_back(triangle1);
 
 		light = Light{ {0.0f, 0.0f, -1.0f} };
 	}
