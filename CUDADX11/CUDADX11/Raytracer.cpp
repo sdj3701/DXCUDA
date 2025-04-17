@@ -12,36 +12,42 @@ glm::vec3 Raytracer::TransformScreenToWorld(glm::vec2 posScreen)
 
 glm::vec3 Raytracer::traceRay(Ray& ray)
 {
-	// 충돌 판정
-	const Hit hit = FindClosestCollision(ray);
+	// Render first hit
+	const auto hit = FindClosestCollision(ray);
 
-	if (hit.d < 0.0f)
+	if (hit.d >= 0.0f)
 	{
-		return glm::vec3(0.0f);
-	}
-	else
-	{
+		glm::vec3 color(hit.obj->amb);
+
 		// 여기서 퐁 모델(Phong reflection model)으로 조명 효과 계산!
 		// 참고 자료
 		// https://en.wikipedia.org/wiki/Phong_reflection_model
 		// https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF
-
 		// Diffuse
-		const glm::vec3 dirToLight = glm::normalize(light.pos - hit.point);
-		const float diff = glm::max(dot(hit.normal, dirToLight), 0.0f);
+		const vec3 dirToLight = glm::normalize(light.pos - hit.point);
+		Ray shadowRay = { hit.point + dirToLight * 1e-4f, dirToLight };
 
-		// Specular
-		const glm::vec3 reflectDir = 2.0f * dot(hit.normal, dirToLight) * hit.normal - dirToLight;
-		const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), hit.obj->alpha);
+		if (FindClosestCollision(shadowRay).d < 0.0f)
+		{
+			const float diff = glm::max(dot(hit.normal, dirToLight), 0.0f);
 
-		return hit.obj->amb + hit.obj->dif * diff + hit.obj->spec * specular;
+			// Specular
+			const vec3 reflectDir = 2.0f * dot(hit.normal, dirToLight) * hit.normal - dirToLight;
+			const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), hit.obj->alpha);
+
+			color += hit.obj->amb + hit.obj->dif * diff + hit.obj->spec * specular;
+		}
+
+		return color;
 	}
+
+	return vec3(0.0f);
 }
 
 void Raytracer::Render(vector<glm::vec4>& pixels)
 {
 	// 뒷 배경
-	std::fill(pixels.begin(), pixels.end(), glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f });
+	std::fill(pixels.begin(), pixels.end(), vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	const glm::vec3 eyePos(0.0f, 0.0f, -1.5f);
 

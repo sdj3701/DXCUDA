@@ -69,14 +69,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             // ImGui UI 코드
             ImGui::Begin("Hello ImGui");
-            /*ImGui::SliderFloat3("Center", &game.raytracer.sphere->center.x, -1.0f, 1.0f);
-            ImGui::SliderFloat("Radius", &game.raytracer.sphere->radius, 0.0f, 1.0f);
-            ImGui::SliderFloat3("Light", &game.raytracer.light.pos.x, -2.0f, 2.0f);
-            ImGui::SliderFloat3("Ambient color", &game.raytracer.sphere->amb.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("Diffuse color", &game.raytracer.sphere->diff.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("Specular color", &game.raytracer.sphere->spec.x, 0.0f, 1.0f);
-            ImGui::SliderFloat("Specular power", &game.raytracer.sphere->alpha, 0.0f, 100.0f);
-            ImGui::SliderFloat("Specular coeff", &game.raytracer.sphere->ks, 0.0f, 1.0f);*/
+            ImGui::SliderFloat3("Light Position", &game.raytracer.light.pos.x, -2.0f, 2.0f);
+            ImGui::SliderFloat3("Sphere Position", &game.raytracer.sphere->center.x, -1.0f, 1.0f);
             ImGui::End();
 
             game.Update();

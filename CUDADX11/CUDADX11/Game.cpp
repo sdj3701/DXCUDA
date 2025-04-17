@@ -459,7 +459,7 @@ void Game::CreateSRV()
     textureDesc.MiscFlags = 0;
 
 	// 2. 초기 데이터 설정 (검은 배경)
-	std::vector<glm::vec4> initialData(_width * _height, glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+	std::vector<glm::vec4> initialData(_width * _height, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	D3D11_SUBRESOURCE_DATA subresourceData;
 	ZeroMemory(&subresourceData, sizeof(subresourceData));

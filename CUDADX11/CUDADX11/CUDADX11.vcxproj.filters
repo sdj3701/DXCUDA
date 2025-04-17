@@ -42,6 +42,9 @@
     <Filter Include="Source Files\56. Object\Triangle">
       <UniqueIdentifier>{1985e026-c541-4ea9-96b4-8e4e2f87cc17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\56. Object\Shadow">
+      <UniqueIdentifier>{2c710ad7-0113-4843-8d91-fb320d7901d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CUDADX11.h">
@@ -98,6 +101,9 @@
     <ClInclude Include="Triangle.h">
       <Filter>Source Files\56. Object\Triangle</Filter>
     </ClInclude>
+    <ClInclude Include="Square.h">
+      <Filter>Source Files\56. Object\Shadow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CUDADX11.rc">
@@ -145,6 +151,9 @@
     </ClCompile>
     <ClCompile Include="Triangle.cpp">
       <Filter>Source Files\56. Object\Triangle</Filter>
+    </ClCompile>
+    <ClCompile Include="Square.cpp">
+      <Filter>Source Files\56. Object\Shadow</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
