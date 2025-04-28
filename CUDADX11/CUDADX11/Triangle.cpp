@@ -3,21 +3,19 @@
 
 Hit Triangle::CheckRayCollision(Ray& ray)
 {
-	Hit hit = Hit{ 1.0, vec3(0.0),vec3(0.0) };
+	Hit hit = Hit{ -1.0, vec3(0.0), vec3(0.0) };
 
 	vec3 point, faceNormal;
 	float t, u, v;
-
-	if (IntersectRayTriangle
-	(
-		ray.start, ray.dir, 
-		v0, v1, v2, 
-		point, faceNormal, t, u, v
-	))
+	if (IntersectRayTriangle(ray.start, ray.dir, this->v0, this->v1,
+		this->v2, point, faceNormal, t, u, v))
 	{
 		hit.d = t;
-		hit.point = point;
+		hit.point = point; // ray.start + ray.dir * t;
 		hit.normal = faceNormal;
+
+		// 텍스춰링(texturing)에서 사용
+		// hit.uv = uv0 * u + uv1 * v + uv2 * (1.0f - u - v);
 	}
 
 	return hit;

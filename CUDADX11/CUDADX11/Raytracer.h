@@ -3,6 +3,7 @@
 #include "Sphere.h"
 #include "Ray.h"
 #include "Light.h"
+#include "Triangle.h"
 #include "Square.h"
 
 class Raytracer
@@ -11,7 +12,7 @@ public:
 	uint32_t width, height;
 	Light light;
 	shared_ptr<Sphere> sphere;
-	std::vector<shared_ptr<Object>> objects;
+	vector<shared_ptr<Object>> objects;
 
 	Raytracer(const uint32_t& width, const uint32_t& height)
 		: width(width), height(height)
@@ -27,12 +28,18 @@ public:
 
 		objects.push_back(sphere1);
 
-		auto ground = make_shared<Square>(vec3(-2.0f, -1.0f, 0.0f), vec3(-2.0f, -1.0f, 4.0f), vec3(2.0f, -1.0f, 4.0f), vec3(2.0f, -1.0f, 0.0f));
-		ground->amb = vec3(0.2f);
-		ground->dif = vec3(0.8f);
-		ground->spec = vec3(1.0f);
-		ground->alpha = 50.0f;
-		objects.push_back(ground);
+		auto triangle1 = make_shared<Triangle>(vec3(-2.0f, -1.0f, 0.0f), vec3(-2.0f, -1.0f, 4.0f), vec3(2.0f, -1.0f, 4.0f));
+		auto triangle2 = make_shared<Triangle>(vec3(-2.0f, -1.0f, 0.0f), vec3(2.0f, -1.0f, 4.0f), vec3(2.0f, -1.0f, 0.0f));
+		triangle1->amb = vec3(0.2f);
+		triangle1->dif = vec3(0.8f);
+		triangle1->spec = vec3(1.0f);
+		triangle1->alpha = 50.0f;
+		triangle2->amb = vec3(0.2f);
+		triangle2->dif = vec3(0.8f);
+		triangle2->spec = vec3(1.0f);
+		triangle2->alpha = 50.0f;
+		objects.push_back(triangle1);
+		objects.push_back(triangle2);
 
 		light = Light{ {0.0f, 1.0f, 0.2f} }; // È­¸é µÞÂÊ
 	}

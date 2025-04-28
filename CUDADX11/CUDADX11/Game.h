@@ -65,6 +65,8 @@ public:
 	// ¿ø °´Ã¼
 	std::unique_ptr<Circle> _circle;
 	Raytracer raytracer;
+	std::vector<glm::vec4> pixels;
+
 
 private:
 	// Device & SwapChain

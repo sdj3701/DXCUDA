@@ -49,36 +49,17 @@ void Game::Init(HWND hwnd)
 
 void Game::Update()
 {
-	/*_transformData.offset.x += 0.003f;
-	_transformData.offset.y += 0.003f;*/
-
-	//gaussianblur.GaussianblurEffect(_shaderResourceView, _deviceContext);
-
-	//std::vector<glm::vec4> pixels(_width * _height, glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
-
-	// 원 그리기
-	//for (int j = 0; j < _height; j++) {
-	//	for (int i = 0; i < _width; i++) {
-	//		if (_circle->IsInside(glm::vec2{ i, j })) {
-	//			pixels[i + _width * j] = _circle->_color; // 직접 vec4 색상 사용
-	//		}
-	//	}
-	//}
 	static int count = 0;
-	if (count == 0) // 한 번만 렌더링
-	{
-		vector<glm::vec4>pixels;
-		pixels.resize(raytracer.width * raytracer.height);
-		// 구 렌더링 해줌 각 픽셀로
-		raytracer.Render(pixels);
+	pixels.resize(raytracer.width * raytracer.height);
+	// 구 렌더링 해줌 각 픽셀로
+	raytracer.Render(pixels);
 
-		// 텍스처 업데이트
-		D3D11_MAPPED_SUBRESOURCE ms;
-		HRESULT hr = _deviceContext->Map(_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		if (SUCCEEDED(hr)) {
-			memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(glm::vec4));
-			_deviceContext->Unmap(_texture.Get(), 0);
-		}
+	// 텍스처 업데이트
+	D3D11_MAPPED_SUBRESOURCE ms;
+	HRESULT hr = _deviceContext->Map(_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+	if (SUCCEEDED(hr)) {
+		memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(glm::vec4));
+		_deviceContext->Unmap(_texture.Get(), 0);
 	}
 	count++;
 
